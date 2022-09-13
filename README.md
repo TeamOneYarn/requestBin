@@ -1,3 +1,15 @@
-hello there
+# About
 
-hi my name is rona
+A requestbin clone.
+
+## Built with
+
+- Node.js
+- Express
+- Handlebars
+- MongoDB
+- Postgres
+
+## Notes
+
+Based File Structure off of: https://medium.com/@abhijeetgurle/file-structure-of-node-js-and-express-application-4d9fb66c8d68
