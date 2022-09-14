@@ -11,8 +11,8 @@ mongoose.connect(url)
   .catch(err => console.log('error connecting to MongoDB:', err.message))
 
 const requestSchema = new mongoose.Schema({
-  body: String,
-  headers: String
+  body: Object,
+  headers: Object
 })
 
 module.exports = mongoose.model('Request', requestSchema)
