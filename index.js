@@ -22,6 +22,7 @@ function parseRequest(request) {
 }
 
 app.get("/", (request, response) => {
+
   Request.find({})
     .then(result => {
       result.forEach((obj) => {
@@ -35,8 +36,8 @@ app.get("/", (request, response) => {
 
 app.post("/", jsonParser, (request, response) => {
   const obj = new Request({
-    body: request.body,
-    headers: request.headers
+    body: JSON.stringify(request.body),
+    headers: JSON.stringify(request.headers)
   })
 
   obj.save().then(savedRequest => response.json(savedRequest))
