@@ -34,6 +34,7 @@ header, footer {
 }
 
 header {
+    width: 23vw;
     align-items: flex-end;
 }
 
@@ -51,6 +52,14 @@ header {
     font-family: 'Alegreya', serif;
 }
 
+.create:hover {
+    color: #3A2716;
+    border: 3px dotted #3A2716;
+    border-bottom: solid;
+    border-left: solid;
+    cursor: pointer;
+}
+
 main {
     font-size: 2em;
     padding: 30px;
@@ -58,6 +67,7 @@ main {
 
 footer {
     border-top: 3px dotted #19404F;
+    font-size: 1.25em;
 }
 
 footer p {

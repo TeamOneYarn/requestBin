@@ -30,7 +30,7 @@ app.get("/", (request, response) => {
     // mongoose.connection.close()
   })
 
-  response.render('home')
+  response.render('home', {basket: true, one: false})
 })
 
 app.post("/", jsonParser, (request, response) => {
