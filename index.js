@@ -1,9 +1,21 @@
 require('dotenv').config()
 const express = require("express")
 const bodyParser = require('body-parser')
+const Handlebars = require('express-handlebars');
+
 const jsonParser = bodyParser.json()
 const app = express()
+
+app.use(express.static('public'))
+
+const hbs = Handlebars.create({ /* config */ });
 const Request = require('./models/request')
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+app.set('views', './views');
+
+
 
 function parseRequest(request) {
 
@@ -19,7 +31,7 @@ app.get("/", (request, response) => {
     // mongoose.connection.close()
   })
 
-  response.send("Hello world")
+  response.render('home', {basket: true, one: false})
 })
 
 app.post("/", jsonParser, (request, response) => {

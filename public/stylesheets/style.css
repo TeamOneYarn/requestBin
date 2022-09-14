@@ -1,0 +1,80 @@
+* {
+    padding: 0;
+    margin: 0
+}
+
+h1 {
+    font-size: 7em;
+    padding-top: 50px;
+    font-family: 'Alegreya Sans', sans-serif;
+}
+
+.github {
+    width: 30px;
+    height: 30px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F2DCA2;
+    color: #3A2716;
+    font-family: 'Alegreya', serif;
+}
+
+header, footer {
+    width: 40vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    flex-direction: column;
+}
+
+header {
+    width: 23vw;
+    align-items: flex-end;
+}
+
+.create {
+    align-self: flex-end;
+    padding: 10px 30px;
+    background-color: #F2DCA2;
+    border-radius: 10px;
+    font-size: 1.25em;
+    color: #19404F;
+    margin-top: -10px;
+    border: 3px dotted #19404F;
+    border-bottom: solid;
+    border-left: solid;
+    font-family: 'Alegreya', serif;
+}
+
+.create:hover {
+    color: #3A2716;
+    border: 3px dotted #3A2716;
+    border-bottom: solid;
+    border-left: solid;
+    cursor: pointer;
+}
+
+main {
+    font-size: 2em;
+    padding: 30px;
+}
+
+footer {
+    border-top: 3px dotted #19404F;
+    font-size: 1.25em;
+}
+
+footer p {
+    display: flex;
+    align-items: center;
+}
+
+p span {
+    margin: 0 10px;
+}
