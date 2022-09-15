@@ -43,7 +43,9 @@ app.get("/", async (request, response) => {
   }
 
   console.log(results[0].body)
-  response.render('home', {basket, one, results})
+  // response.render('home', {basket, one, results}) // multiple baskets view
+  // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
+  response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
 })
 
 app.post("/", jsonParser, (request, response) => {

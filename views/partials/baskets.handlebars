@@ -1,16 +1,17 @@
-{{#if one}}
-  One basket
-{{else}}
+{{#unless one}}
   <ul>
   {{#each results}}
     <div class="basket">
-      <p>> basketURL</p>
+      <p> basketURL</p>
       <p>
-        <span>4d ago</span>
-        <span>From 72.177.40.194</span>
+        <span>Created: </span>
       </p>
     </div>
-    <li>
+    <li class="hidden">
+      <div class="meta_data">
+        4d ago
+        144.343.322.1
+      </div>
       <div class="parameters">
         Parameters:
         None
@@ -28,4 +29,16 @@
     </li>
   {{/each}}
   </ul>
-{{/if}}
+{{/unless}}
+
+<ul>
+  <div class="basket">
+    <p> basketURL</p>
+    <p>
+      <span>Created: </span>
+    </p>
+  </div>
+  <li class="hidden">
+    {{> tips}}
+  </li>
+</ul>
