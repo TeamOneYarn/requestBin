@@ -10,6 +10,7 @@ app.use(express.static('public'))
 
 const hbs = Handlebars.create({ /* config */ });
 const Request = require('./models/request')
+const yarnBasketDB = require('./models/yarnBasket')
 
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
