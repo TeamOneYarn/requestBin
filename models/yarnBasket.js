@@ -1,8 +1,14 @@
 const { Client } = require('pg')
 
-const client = new Client({connectionString: process.env.POSTGRES_URI})
+const client = new Client({
+  host: process.env.PGHOST,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  port: process.env.PGPORT
+})
 
-console.log("connecting to postgres on fly...")
+console.log("connecting to local postgres...")
 
 client.connect(err => {
   if (err) {
@@ -12,13 +18,9 @@ client.connect(err => {
   }
 })
 
-// flyctl postgres connect -a request-bin
-// --> takes me to postgres console
-
-// database name: yarn_basket (\c yarn_basket)
-
-// problem might be regarding DNS
 /*
+CREATE DATABASE yarn_basket;
+
 CREATE TABLE ip_address(
   id serial PRIMARY KEY,
   ip text NOT NULL
@@ -44,20 +46,5 @@ CREATE TABLE requests(
   FOREIGN KEY (bin_id) REFERENCES bins (id)
 );
 */
-
-
-// client.connect()
-//   .then(res => )
-// const res = client.query('SELECT $1::text as message', ['Hello world!']).then((res) => console.log(res)).then(() => client.end())
-// console.log(res.rows[0].message) // Hello world!
-// await client.end()
-
-// const client = new Client({
-//   host: process.env.PGHOST,
-//   port: process.env.PGPORT, // this is Postgres Port; where do we put Proxy Port?
-//   user: process.env.PGUSER,
-//   password: process.env.PGPASSWORD,
-
-// })
 
 module.exports = client
