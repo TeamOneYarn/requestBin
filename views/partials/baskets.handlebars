@@ -1,0 +1,44 @@
+{{#unless one}}
+  <ul>
+  {{#each results}}
+    <div class="basket">
+      <p> basketURL</p>
+      <p>
+        <span>Created: </span>
+      </p>
+    </div>
+    <li class="hidden">
+      <div class="meta_data">
+        4d ago
+        144.343.322.1
+      </div>
+      <div class="parameters">
+        Parameters:
+        None
+      </div>
+      <div class="headers">
+        Headers:
+        {{#each this.header}}
+          {{> pair}}
+        {{/each}}
+      </div>
+      Body:
+      <div class="body">
+        {{this.body}}
+      </div>
+    </li>
+  {{/each}}
+  </ul>
+{{/unless}}
+
+<ul>
+  <div class="basket">
+    <p> basketURL</p>
+    <p>
+      <span>Created: </span>
+    </p>
+  </div>
+  <li class="hidden">
+    {{> tips}}
+  </li>
+</ul>

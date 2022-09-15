@@ -89,6 +89,29 @@ app.get("/:path", (request, response) => {
 
       response.send("hellooo")
       //do page rending here
+       results = await Request.find({});
+  let basket;
+  let one;
+
+  results = results.map(obj => ({header: JSON.parse(obj.headers), body: obj.body}))
+
+  switch(results.length) {
+    case 0:
+      basket = false;
+      break;
+    case 1:
+      basket = true;
+      one = true;
+      break
+    default:
+      basket = true
+      one = false;
+  }
+
+  console.log(results[0].body)
+  // response.render('home', {basket, one, results}) // multiple baskets view
+  // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
+  response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
 })
