@@ -19,21 +19,22 @@ client.connect(err => {
 })
 
 /*
+NEW TABLE SCHEMAS
 CREATE DATABASE yarn_basket;
 
-CREATE TABLE ip_address(
+CREATE TABLE users(
   id serial PRIMARY KEY,
-  ip text NOT NULL
+  random_string text UNIQUE NOT NULL
 );
 
 CREATE TABLE bins(
   id serial PRIMARY KEY,
+  subdomain text UNIQUE NOT NULL,
   created_at timestamp DEFAULT NOW(),
-  last_updated timestamp,
-  request_count int,
-  share_path text,
-  ip_address_id int,
-  FOREIGN KEY (ip_address_id) REFERENCES ip_address (id)
+  last_updated timestamp DEFAULT NOW(),
+  request_count int DEFAULT 0,
+  user_id int,
+  FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE requests(
