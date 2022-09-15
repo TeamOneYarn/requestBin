@@ -19,7 +19,7 @@ pool.connect(err => {
   if (err) {
     console.error('connection error', err.stack)
   } else {
-    console.log('connected')
+    console.log('connected to postgres')
   }
 })
 
@@ -53,6 +53,10 @@ charactersLength));
  return result;
 }
 
+app.get("/subdomain", (request, response) => {
+  response.send(request.subdomains)
+})
+
 app.get('/', async (req, res) => {
   let id = makeId(10) // further improvement if time
   let query = `INSERT INTO users (random_string) VALUES ($1) RETURNING *`
@@ -70,6 +74,11 @@ app.get("/:path", (request, response) => {
   let findId = `SELECT id FROM users WHERE random_string = ($1);`
   let values1 = [path]
   pool.query(findId, values1).then(res => {
+    if (res.rows.length == 0) {
+      response.send("user doens't exist");
+      return
+    }
+
     userId = res.rows[0].id
 
     let findAllBins = `SELECT * FROM bins WHERE user_id = ($1);`
@@ -78,7 +87,7 @@ app.get("/:path", (request, response) => {
       let bins = res.rows // returns array of objects
       console.log(bins)
 
-      response.send("hello")
+      response.send("hellooo")
       //do page rending here
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
