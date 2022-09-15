@@ -18,20 +18,32 @@ app.set('views', './views');
 
 
 function parseRequest(request) {
-
+  
 }
 
-app.get("/", (request, response) => {
+app.get("/", async (request, response) => {
 
-  Request.find({})
-    .then(result => {
-      result.forEach((obj) => {
-        console.log(obj)
-    })
-    // mongoose.connection.close()
-  })
+  results = await Request.find({});
+  let basket;
+  let one;
 
-  response.render('home', {basket: true, one: false})
+  results = results.map(obj => ({header: JSON.parse(obj.headers), body: obj.body}))
+
+  switch(results.length) {
+    case 0:
+      basket = false;
+      break;
+    case 1:
+      basket = true;
+      one = true;
+      break
+    default:
+      basket = true
+      one = false;
+  }
+
+  console.log(results[0].body)
+  response.render('home', {basket, one, results})
 })
 
 app.post("/", jsonParser, (request, response) => {

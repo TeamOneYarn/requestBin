@@ -1,5 +1,31 @@
 {{#if one}}
   One basket
 {{else}}
-  Multiple baskets
+  <ul>
+  {{#each results}}
+    <div class="basket">
+      <p>> basketURL</p>
+      <p>
+        <span>4d ago</span>
+        <span>From 72.177.40.194</span>
+      </p>
+    </div>
+    <li>
+      <div class="parameters">
+        Parameters:
+        None
+      </div>
+      <div class="headers">
+        Headers:
+        {{#each this.header}}
+          {{> pair}}
+        {{/each}}
+      </div>
+      Body:
+      <div class="body">
+        {{this.body}}
+      </div>
+    </li>
+  {{/each}}
+  </ul>
 {{/if}}
