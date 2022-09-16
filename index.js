@@ -47,14 +47,38 @@ function makeId(length) {
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
   for ( var i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * 
+    result += characters.charAt(Math.floor(Math.random() *
 charactersLength));
  }
  return result;
 }
 
-app.get("/subdomain", (request, response) => {
-  response.send(request.subdomains)
+app.get("/", (request, response) => {
+  let subdomain = request.subdomains[0]
+
+  let findId = `SELECT id FROM bins WHERE subdomain = ($1);`
+  let values1 = [subdomain]
+  pool.query(findId, values1).then(res => {
+    if (res.rows.length == 0) {
+      response.send("user doens't exist");
+      return
+    }
+
+    const obj = new Request({
+      body: request.body,
+      headers: request.headers
+    })
+
+    obj.save().then(savedRequest => {
+      let mongoId = savedRequest._id
+
+      let createRequest = `INSERT INTO requests (bin_id, mongo_id) VALUES ($1, $2) RETURNING *`
+      let values = [res.rows[0].id, mongoId]
+      pool.query(createRequest, values).then(res => {
+        console.log("Request Saved")
+      })
+    }).catch(err => console.error('Error saving request', err.stack));
+  }).catch(err => console.error('Error selecting bin', err.stack));
 })
 
 app.get('/', async (req, res) => {
@@ -89,29 +113,29 @@ app.get("/:path", (request, response) => {
 
       response.send("hellooo")
       //do page rending here
-       results = await Request.find({});
-  let basket;
-  let one;
+      // results = await Request.find({});
+      // let basket;
+      // let one;
 
-  results = results.map(obj => ({header: JSON.parse(obj.headers), body: obj.body}))
+      // results = results.map(obj => ({header: JSON.parse(obj.headers), body: obj.body}))
 
-  switch(results.length) {
-    case 0:
-      basket = false;
-      break;
-    case 1:
-      basket = true;
-      one = true;
-      break
-    default:
-      basket = true
-      one = false;
-  }
+      // switch(results.length) {
+      //   case 0:
+      //     basket = false;
+      //     break;
+      //   case 1:
+      //     basket = true;
+      //     one = true;
+      //     break
+      //   default:
+      //     basket = true
+      //     one = false;
+      // }
 
-  console.log(results[0].body)
-  // response.render('home', {basket, one, results}) // multiple baskets view
-  // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
-  response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
+      // console.log(results[0].body)
+      // response.render('home', {basket, one, results}) // multiple baskets view
+      // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
+      response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
 })
