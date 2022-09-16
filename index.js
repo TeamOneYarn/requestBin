@@ -32,16 +32,6 @@ app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
-app.post("/", jsonParser, (request, response) => {
-  const obj = new Request({
-    body: JSON.stringify(request.body),
-    headers: JSON.stringify(request.headers)
-  })
-
-  obj.save().then(savedRequest => response.json(savedRequest))
-  // mongoose.connection.close()
-})
-
 function makeId(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -53,20 +43,33 @@ charactersLength));
  return result;
 }
 
-app.get("/", (request, response) => {
+app.get('/', async (request, response) => {
+  let id = makeId(10) // further improvement if time
+  let query = `INSERT INTO users (random_string) VALUES ($1) RETURNING *`
+  let values = [id]
+  pool.query(query, values)
+  .then(res => {
+    console.log(res.rows[0].random_string)
+    response.redirect(`/${id}`)
+  })
+  .catch(err => console.error('Error executing query', err.stack))
+
+})
+
+app.post("/", (request, response) => {
   let subdomain = request.subdomains[0]
 
   let findId = `SELECT id FROM bins WHERE subdomain = ($1);`
   let values1 = [subdomain]
   pool.query(findId, values1).then(res => {
     if (res.rows.length == 0) {
-      response.send("user doens't exist");
+      response.send("user doesn't exist");
       return
     }
 
     const obj = new Request({
-      body: request.body,
-      headers: request.headers
+      body: JSON.stringify(request.body),
+      headers: JSON.stringify(request.headers)
     })
 
     obj.save().then(savedRequest => {
@@ -79,18 +82,9 @@ app.get("/", (request, response) => {
       })
     }).catch(err => console.error('Error saving request', err.stack));
   }).catch(err => console.error('Error selecting bin', err.stack));
+
 })
 
-app.get('/', async (req, res) => {
-  let id = makeId(10) // further improvement if time
-  let query = `INSERT INTO users (random_string) VALUES ($1) RETURNING *`
-  let values = [id]
-  pool.query(query, values)
-  .then(res => console.log(res.rows[0].random_string))
-  .catch(err => console.error('Error executing query', err.stack))
-
-  res.redirect(`/${id}`)
-})
 
 app.get("/:path", (request, response) => {
   let path = request.params.path;
@@ -99,7 +93,7 @@ app.get("/:path", (request, response) => {
   let values1 = [path]
   pool.query(findId, values1).then(res => {
     if (res.rows.length == 0) {
-      response.send("user doens't exist");
+      response.send("user doesn't exist");
       return
     }
 
@@ -135,7 +129,7 @@ app.get("/:path", (request, response) => {
       // console.log(results[0].body)
       // response.render('home', {basket, one, results}) // multiple baskets view
       // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
-      response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
+     // response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
 })
@@ -156,7 +150,7 @@ app.post("/create/:path", async (request, response) => {
     }).catch(err => console.error('Error insert query', err.stack));
   })
   .catch(err => console.error('Error executing query', err.stack))
-  // res.redirect(`/${path}`)
+  response.redirect(`/${path}`)
 })
 
 const PORT = process.env.PORT
