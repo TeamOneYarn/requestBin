@@ -43,6 +43,36 @@ charactersLength));
  return result;
 }
 
+function createState(bins) {
+  let state = { bins: [] }
+
+  bins.forEach(bin => {
+    let newBin = { request_count: bin.request_count, created_at: bin.created_at, requests: [] }
+
+    let selectRelatedRequests = `SELECT mongo_id FROM requests WHERE bin_id = ($1)`
+    let binId = [bin.id]
+    pool.query(selectRelatedRequests, binId).then(res => {
+      res.rows.forEach(request => {
+        let newRequest = {}
+        let mongoId = request.mongo_id.replaceAll('"', '');
+        console.log(mongoId, "mongoId here")
+
+        Request.find({_id: mongoId}).then(res => {
+          console.log(res, "result from mongoose request")
+          newRequest.headers = res.headers
+          newRequest.body = res.body
+
+          newBin.requests.push(newRequest)
+        }) 
+      })
+    })
+
+    state.bins.push(newBin)
+  })
+
+  return state
+}
+
 app.get('/', async (request, response) => {
   let id = makeId(10) // further improvement if time
   let query = `INSERT INTO users (random_string) VALUES ($1) RETURNING *`
@@ -56,36 +86,6 @@ app.get('/', async (request, response) => {
 
 })
 
-app.post("/", (request, response) => {
-  let subdomain = request.subdomains[0]
-
-  let findId = `SELECT id FROM bins WHERE subdomain = ($1);`
-  let values1 = [subdomain]
-  pool.query(findId, values1).then(res => {
-    if (res.rows.length == 0) {
-      response.send("user doesn't exist");
-      return
-    }
-
-    const obj = new Request({
-      body: JSON.stringify(request.body),
-      headers: JSON.stringify(request.headers)
-    })
-
-    obj.save().then(savedRequest => {
-      let mongoId = savedRequest._id
-
-      let createRequest = `INSERT INTO requests (bin_id, mongo_id) VALUES ($1, $2) RETURNING *`
-      let values = [res.rows[0].id, mongoId]
-      pool.query(createRequest, values).then(res => {
-        console.log("Request Saved")
-      })
-    }).catch(err => console.error('Error saving request', err.stack));
-  }).catch(err => console.error('Error selecting bin', err.stack));
-
-})
-
-
 app.get("/:path", (request, response) => {
   let path = request.params.path;
 
@@ -97,7 +97,7 @@ app.get("/:path", (request, response) => {
       return
     }
 
-    userId = res.rows[0].id
+    let userId = res.rows[0].id
 
     let findAllBins = `SELECT * FROM bins WHERE user_id = ($1);`
     let values = [userId]
@@ -105,31 +105,34 @@ app.get("/:path", (request, response) => {
       let bins = res.rows // returns array of objects
       console.log(bins)
 
-      // response.send("hellooo")
-      //do page rending here
-      // results = await Request.find({});
-      // let basket;
-      // let one;
+      let state = createState(bins);
+      console.log(state, "state here")
+      let basket;
+      let one;
 
-      // results = results.map(obj => ({header: JSON.parse(obj.headers), body: obj.body}))
+      let results = state.bins.map(bin => {
+        console.log(bin, "bin here")
+        return bin.requests
+      })
 
-      // switch(results.length) {
-      //   case 0:
-      //     basket = false;
-      //     break;
-      //   case 1:
-      //     basket = true;
-      //     one = true;
-      //     break
-      //   default:
-      //     basket = true
-      //     one = false;
-      // }
+      switch(state.bins.length) {
+        case 0:
+          basket = false;
+          break;
+        case 1:
+          basket = true;
+          one = true;
+          break
+        default:
+          basket = true
+          one = false;
+      }
 
       // console.log(results[0].body)
-      // response.render('home', {basket, one, results}) // multiple baskets view
-      // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
-     response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
+      console.log(basket, "basket here")
+      console.log(one, "one here")
+      console.log(results, "result here")
+      response.render('home', {basket, one, results}) // multiple baskets view
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
 })
@@ -141,7 +144,7 @@ app.post("/create/:path", async (request, response) => {
   let findId = `SELECT id FROM users WHERE random_string = ($1);`
   let values1 = [path]
   pool.query(findId, values1).then(res => {
-    userId = res.rows[0].id
+    let userId = res.rows[0].id
 
     let query = `INSERT INTO bins (subdomain, user_id) VALUES ($1, $2) RETURNING *`
     let values = [subdomain, userId]
@@ -152,6 +155,58 @@ app.post("/create/:path", async (request, response) => {
   .catch(err => console.error('Error executing query', err.stack))
   response.redirect(`/${path}`)
 })
+
+app.post("/:path/:subdomain", (request, response) => {
+  let subdomain = request.params.subdomain
+  let path = request.params.path
+
+  let findPath = `SELECT id FROM users WHERE random_string = ($1);`
+  let values2 = [path]
+  pool.query(findPath, values2).then(res => {
+    if (res.rows.length == 0) {
+      response.send("user doesn't exist");
+      return
+    }
+    
+    let findId = `SELECT id FROM bins WHERE subdomain = ($1);`
+    let values1 = [subdomain]
+
+    pool.query(findId, values1).then(res => {
+      if (res.rows.length == 0) {
+        response.send("bin doesn't exist");
+        return
+      }
+
+      const obj = new Request({
+        body: JSON.stringify(request.body),
+        headers: JSON.stringify(request.headers)
+      })
+
+      obj.save().then(savedRequest => {
+        let mongoId = savedRequest._id
+
+        let createRequest = `INSERT INTO requests (bin_id, mongo_id) VALUES ($1, $2) RETURNING *`
+        let binId = res.rows[0].id
+        let values = [binId, mongoId]
+        pool.query(createRequest, values).then(res => {
+          let getCurrentCount = `SELECT request_count FROM bins WHERE id = ($1)`;
+          let values4 = [binId]
+          pool.query(getCurrentCount, values4).then(res => {
+            let count = Number(res.rows[0].request_count) + 1
+
+            let updateCount = `UPDATE bins SET request_count = ($1) WHERE id = ($2)`
+            let values5 = [count, binId]
+            pool.query(updateCount, values5).then(res => {
+              console.log("Request Saved")
+              console.log("Count updated")
+            }).catch(err => console.error('Error saving request and count', err.stack));
+          }).catch(err => console.error('Error updating count', err.stack));
+        }).catch(err => console.error('Error getting currentCount', err.stack));
+      }).catch(err => console.error('Error saving request', err.stack));
+    }).catch(err => console.error('Error selecting bin', err.stack));
+  }).catch(err => console.error('Error selecting user', err.stack));
+})
+
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

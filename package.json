@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,5 +26,8 @@
     "ip": "^2.0.0",
     "mongoose": "^6.6.0",
     "pg": "^8.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }

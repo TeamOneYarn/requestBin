@@ -40,3 +40,12 @@ Found this for handlebars with express: https://www.npmjs.com/package/express-ha
 `user`: random_string
 `bins`: user_id, subdomain
 `requests`: bin_id, mongo_id
+
+# Future Improvements
+- update last_updated column in bins when a request comes in
+- change the app.post "/:path/:subdomain" route to app.all()
+- change then/catch to async/await
+- try subdomains instead of paths
+- modularize the code
+  - refactor routes
+  - move to separate files
