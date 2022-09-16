@@ -1,5 +1,9 @@
-document.getElementsByClassName("create")[0].addEventListener("click", () => {
-  console.log('Test');
+document.getElementsByClassName("create")[0].addEventListener("click", async (event) => {
+  const url = window.location.href;
+  path = url.slice(-10)
+  await fetch(`/create/:${path}`, {
+    method: 'POST',
+  })
 })
 
 $('.basket').next('li').hide();

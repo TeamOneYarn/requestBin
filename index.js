@@ -101,11 +101,11 @@ app.get("/:path", (request, response) => {
 
     let findAllBins = `SELECT * FROM bins WHERE user_id = ($1);`
     let values = [userId]
-    pool.query(findAllBins, values).then(res => {
+    pool.query(findAllBins, values).then(async (res) => {
       let bins = res.rows // returns array of objects
       console.log(bins)
 
-      response.send("hellooo")
+      // response.send("hellooo")
       //do page rending here
       // results = await Request.find({});
       // let basket;
@@ -129,7 +129,7 @@ app.get("/:path", (request, response) => {
       // console.log(results[0].body)
       // response.render('home', {basket, one, results}) // multiple baskets view
       // response.render('home', {basket: false, one: undefined, results: undefined}) // no-baskets view
-     // response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
+     response.render('home', {basket: true, one: true, results: undefined}) // one-basket view w/ no requests yet
     }).catch(err => console.error('Error collecting all user bins', err.stack));
   }).catch(err => console.error('Error executing query', err.stack))
 })
