@@ -30,7 +30,7 @@ Found this for handlebars with express: https://www.npmjs.com/package/express-ha
 - updates the `bins` table
 - redirects to /:path 
 
-`POST '/:path/:subdomain'`
+`ALL '/:path/:subdomain'`
 - gets the subdomain from the request sent by a webhook
 - updates the `bins` table
 - creates a MongoDB document
