@@ -10,11 +10,6 @@ A requestbin clone.
 - MongoDB
 - Postgres
 
-## Notes
-
-Based File Structure off of: https://medium.com/@abhijeetgurle/file-structure-of-node-js-and-express-application-4d9fb66c8d68
-Found this for handlebars with express: https://www.npmjs.com/package/express-handlebars
-
 ## Routes
 `GET '/'`
 - creates a `random_string` unique to the user
@@ -37,9 +32,9 @@ Found this for handlebars with express: https://www.npmjs.com/package/express-ha
 - updates the `requests` table
 
 ## Postgres Schema
-`user`: random_string
-`bins`: user_id, subdomain
-`requests`: bin_id, mongo_id
+- `user`: random_string
+- `bins`: user_id, subdomain
+- `requests`: bin_id, mongo_id
 
 # Future Improvements
 - update last_updated column in bins when a request comes in
